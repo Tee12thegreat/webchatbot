@@ -52,7 +52,7 @@ export default function handler(req, res) {
         };
 
         // Broader keyword matching
-        if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi') || lowerCaseMessage.includes('hey')) {
+        if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hie') || lowerCaseMessage.includes('hey')) {
             botResponse = getRandomResponse(responses.hello);
         } else if (lowerCaseMessage.includes('help') || lowerCaseMessage.includes('assist') || lowerCaseMessage.includes('support')) {
             botResponse = getRandomResponse(responses.help);

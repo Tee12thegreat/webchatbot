@@ -19,6 +19,7 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            position: relative; /* For positioning the chat icon */
         }
 
         /* Chatbox container */
@@ -29,13 +30,16 @@
             border-radius: 10px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            display: flex;
+            display: none; /* Initially hidden */
             flex-direction: column;
+            position: absolute; /* Positioning relative to body */
+            bottom: 70px; /* Space above the icon */
+            right: 20px; /* Align to right */
         }
 
         /* Chat header */
         .chat-header {
-            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            background-color: #4b5563; /* Dark grey */
             color: white;
             text-align: center;
             padding: 1rem;
@@ -48,7 +52,7 @@
             flex: 1;
             padding: 1rem;
             overflow-y: auto;
-            background-color: #f9fafb;
+            background-color: #e5e7eb; /* Light grey */
         }
 
         .message {
@@ -62,7 +66,7 @@
 
         .message.user .text {
             display: inline-block;
-            background: #4f46e5;
+            background-color: #4b5563; /* Dark grey */
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -71,7 +75,7 @@
 
         .message.bot .text {
             display: inline-block;
-            background: #e5e7eb;
+            background-color: #d1d5db; /* Light grey for bot messages */
             color: black;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -82,13 +86,13 @@
         .chat-input {
             display: flex;
             padding: 0.5rem;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #e5e7eb; /* Light grey border */
         }
 
         .chat-input input {
             flex: 1;
             padding: 0.5rem;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #e5e7eb; /* Light grey border */
             border-radius: 5px;
             font-size: 1rem;
             outline: none;
@@ -96,55 +100,77 @@
 
         .chat-input button {
             margin-left: 0.5rem;
-            background: #4f46e5;
+            background-color: #4b5563; /* Dark grey */
             color: white;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out;
         }
 
         .chat-input button:hover {
-            background: #3730a3;
+            background-color: #374151; /* Darker grey on hover */
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
+        /* Floating action button (chat icon) */
+        .chat-icon {
+          position:absolute; 
+          bottom :20px; 
+          right :20px; 
+          width :60px; 
+          height :60px; 
+          background-color :#4b5563; 
+          color:white; 
+          border-radius :50%; 
+          display:flex; 
+          align-items:center; 
+          justify-content:center; 
+          box-shadow :0px 4px 10px rgba(0,0,0,0.2); 
+          cursor:pointer; 
+          transition :background-color .3s ease-in-out; 
+      }
+      
+      .chat-icon:hover { 
+          background-color:#374151; 
+      }
 
-        @keyframes slideInRight {
-            from {
-                transform: translateX(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+      /* Animations */
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+          }
+          to {
+              opacity: 1;
+          }
+      }
 
-        @keyframes slideInLeft {
-            from {
-                transform: translateX(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+      @keyframes slideInRight {
+          from {
+              transform: translateX(50px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
+
+      @keyframes slideInLeft {
+          from {
+              transform: translateX(-50px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
     </style>
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
         <div class="chat-header">Chatbot 🤖</div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input">
@@ -153,56 +179,71 @@
         </div>
     </div>
 
+    <!-- Floating action button -->
+    <div class="chat-icon" id="chatIcon">💬</div>
+
     <script>
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendMessageButton = document.getElementById('sendMessageButton');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatIcon = document.getElementById('chatIcon');
 
-        // Append message to chat
-        function appendMessage(message, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender);
+        // Toggle chat visibility
+        chatIcon.addEventListener('click', () => {
+           chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+           if (chatContainer.style.display === 'flex') userInput.focus(); // Focus input when opened
+       });
 
-            const textSpan = document.createElement('span');
-            textSpan.classList.add('text');
-            textSpan.textContent = message;
+       // Append message to chat
+       function appendMessage(message, sender) {
+           const messageDiv = document.createElement('div');
+           messageDiv.classList.add('message', sender);
 
-            messageDiv.appendChild(textSpan);
-            chatMessages.appendChild(messageDiv);
+           const textSpan = document.createElement('span');
+           textSpan.classList.add('text');
+           textSpan.textContent = message;
 
-            // Scroll to the bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+           messageDiv.appendChild(textSpan);
+           chatMessages.appendChild(messageDiv);
 
-        // Send message to the server
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
+           // Scroll to the bottom
+           chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Append user's message
-            appendMessage(message, 'user');
-            userInput.value = '';
+           // Optional sound effect for new messages
+           const audio = new Audio('notification-sound.mp3'); // Add notification sound file path
+           audio.play();
+       }
 
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message }),
-                });
+       // Send message to the server
+       async function sendMessage() {
+           const message = userInput.value.trim();
+           if (!message) return;
 
-                const data = await response.json();
-                appendMessage(data.response, 'bot');
-            } catch (error) {
-                console.error('Error:', error);
-                appendMessage('Something went wrong. Please try again.', 'bot');
-            }
-        }
+           // Append user's message
+           appendMessage(message, 'user');
+           userInput.value = '';
 
-        // Event listeners
-        sendMessageButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+           try {
+               const response = await fetch('/api/chat', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({ message }),
+               });
+
+               const data = await response.json();
+               appendMessage(data.response, 'bot');
+           } catch (error) {
+               console.error('Error:', error);
+               appendMessage('Something went wrong. Please try again.', 'bot');
+           }
+       }
+
+       // Event listeners
+       sendMessageButton.addEventListener('click', sendMessage);
+       userInput.addEventListener('keypress', (e) => {
+           if (e.key === 'Enter') sendMessage();
+       });
     </script>
 </body>
 </html>
