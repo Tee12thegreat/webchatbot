@@ -3,130 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot</title>
+    <title>Modern Chatbot</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Global styles */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f3f4f6;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f9f9f9;
         }
 
-        #chatbox {
+        /* Chatbox container */
+        .chat-container {
             width: 90%;
             max-width: 400px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 10px;
         }
 
-        #messages {
+        /* Chat header */
+        .chat-header {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Chat messages */
+        .chat-messages {
             flex: 1;
-            height: 300px;
+            padding: 1rem;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #f9fafb;
         }
 
-        #messages div {
-            margin-bottom: 10px;
+        .message {
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .user {
+        .message.user {
             text-align: right;
-            color: blue;
         }
 
-        .bot {
-            text-align: left;
-            color: green;
+        .message.user .text {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            animation: slideInRight 0.3s ease-in-out;
         }
 
-        #inputContainer {
+        .message.bot .text {
+            display: inline-block;
+            background: #e5e7eb;
+            color: black;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            animation: slideInLeft 0.3s ease-in-out;
+        }
+
+        /* Input container */
+        .chat-input {
             display: flex;
-            gap: 10px;
+            padding: 0.5rem;
+            border-top: 1px solid #e5e7eb;
         }
 
-        #inputContainer input {
+        .chat-input input {
             flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
             border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
         }
 
-        #inputContainer button {
-            padding: 8px 16px;
-            background: blue;
+        .chat-input button {
+            margin-left: 0.5rem;
+            background: #4f46e5;
             color: white;
             border: none;
+            padding: 0.5rem 1rem;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s ease-in-out;
         }
 
-        #inputContainer button:hover {
-            background: darkblue;
+        .chat-input button:hover {
+            background: #3730a3;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="chatbox">
-        <div id="messages"></div>
-        <div id="inputContainer">
-            <input type="text" id="userInput" placeholder="Type a message..." />
-            <button id="sendBtn">Send</button>
+    <div class="chat-container">
+        <div class="chat-header">Chatbot 🤖</div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your message..." />
+            <button id="sendMessageButton">Send</button>
         </div>
     </div>
 
     <script>
-        const messagesDiv = document.getElementById('messages');
+        const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
+        const sendMessageButton = document.getElementById('sendMessageButton');
 
-        const appendMessage = (message, sender) => {
+        // Append message to chat
+        function appendMessage(message, sender) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = sender;
-            messageDiv.textContent = message;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
-        };
+            messageDiv.classList.add('message', sender);
 
-        const sendMessage = async () => {
+            const textSpan = document.createElement('span');
+            textSpan.classList.add('text');
+            textSpan.textContent = message;
+
+            messageDiv.appendChild(textSpan);
+            chatMessages.appendChild(messageDiv);
+
+            // Scroll to the bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send message to the server
+        async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
 
-            // Show user's message
+            // Append user's message
             appendMessage(message, 'user');
             userInput.value = '';
 
-            // Send the message to the backend
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message }),
                 });
-                const data = await response.json();
 
-                // Show bot's response
+                const data = await response.json();
                 appendMessage(data.response, 'bot');
             } catch (error) {
                 console.error('Error:', error);
-                appendMessage('Error communicating with the server.', 'bot');
+                appendMessage('Something went wrong. Please try again.', 'bot');
             }
-        };
+        }
 
-        sendBtn.addEventListener('click', sendMessage);
+        // Event listeners
+        sendMessageButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
